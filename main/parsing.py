@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-
+from main.models import Player
 
 def players_parsing():
 
@@ -22,6 +22,7 @@ def players_parsing():
         name_n_role = soup.find_all('table', class_='inline-table')
         commands = soup.find_all('td', class_='zentriert')
         ages = soup.find_all('td', class_="zentriert")
+        countries = soup.find_all('td', class_="zentriert")
 
         players_count = players_counting[pages.index(page)]
         for nr in name_n_role:
@@ -29,7 +30,6 @@ def players_parsing():
                 index = players_count
                 name = nr.find_all('a')[-1].text
                 role = nr.find_all('td')[-1].text
-                # print(index, name, role)
                 players_count += 1
                 players_data1 = {'id': index,
                                 'name': name,
@@ -52,10 +52,8 @@ def players_parsing():
         players_count = players_counting[pages.index(page)]
 
         for i in ages:
-            # print(count, i)
             if i.find('img'):
                 if ages[count - 1].text != '':
-                    # print(players_count)
                     age = ages[count - 1].text
                     for i in players:
                         if i['id'] == players_count:
@@ -74,24 +72,25 @@ def players_parsing():
                     i['cost'] = value
             players_count += 1
 
-    return players
+        players_count = players_counting[pages.index(page)]
+        for c in countries:
+            if c.find('img', class_="flaggenrahmen"):
+                country = c.find('img', class_="flaggenrahmen").get('alt')
+                for i in players:
+                    if i['id'] == players_count:
+                        i['country'] = country
+                players_count += 1
 
-        # players_count = players_counting[pages.index(page)]
-        # for i in soup.find_all('a'):
-        #     if 'profil/spieler' in str(i.get('href')):
-        #         url = f'https://www.transfermarkt.world{i.get('href')}'
-        #
-        #         response = requests.get(url, headers=headers)
-        #         soup = BeautifulSoup(response.text, "lxml")
-        #         for i in soup.find_all('a', class_="data-header__success-data"):
-        #             if i.get('title') == 'Победитель Лиги Чемпионов':
-        #                 cl = i.find('span', class_="data-header__success-number").text
-        #                 for i in players:
-        #                     if i['id'] == players_count:
-        #                         i['cl'] = cl
+    for i in players:
 
-
-                # players_count += 1
-
-for i in players_parsing():
-    print(i)
+        Player.objects.update_or_create(
+            name=i['name'],
+            defaults={
+                'team': i['team'],
+                'role': i['role'],
+                'cl': int(i['cl']),
+                'age': int(i['age']),
+                'country': i['country'],
+                'cost': i['cost']
+            }
+        )
