@@ -8,22 +8,280 @@
     <title>football</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!--    <link href="/static/css/style.css" rel="stylesheet">-->
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            /*border: 1px red solid;*/
+        }
 
+        /* @media screen and (max-width: 849px) {
+            .game {
+                padding-left: 75px;
+                padding-right: 75px;
+            }
+            } */
+        main {
+            display: flex;
+            justify-content: center;
+        }
+
+        .no_form {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-height: 100%;
+        }
+
+        .center {
+            padding-left: calc(50% - 100px);
+            padding-right: calc(50% - 100px);
+        }
+
+        body {
+            background-color: #1D1B20;
+            font-family: "Roboto", sans-serif;
+            color: white;
+        }
+
+        .title {
+            font-size: 32px;
+            line-height: Label Large/Line Height;
+            letter-spacing: Label Large/Tracking;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 500;
+            font-style: normal;
+            font-variation-settings: "wdth" 100;
+            width: 100%;
+        }
+
+        .subtitle {
+            font-weight: 400;
+            font-size: 16px;
+            /* line-height: Label Large/Line Height; */
+            /* letter-spacing: Label Large/Tracking; */
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .input {
+            width: 100%;
+            max-width: 824px;
+            height: 46px;
+            border: none;
+            border-radius: 8px;
+            background-color: white;
+            background-position: left;
+            background-position-x: 18.25px;
+            background-position-y: 50%;
+            color: black;
+            padding-left: 17px;
+        }
+
+        .info-panel {
+            display: flex;
+            flex-direction: row;
+            max-width: 824px;
+            width: 100%;
+            height: 32px;
+            gap: 4px;
+            background-color: #362431;
+            border-radius: 4px;
+        }
+
+        .players-panel {
+            display: flex;
+            flex-direction: row;
+            max-width: 824px;
+            width: 100%;
+            height: 32px;
+            gap: 4px;
+            background-color: transparent;
+            border-radius: 4px;
+        }
+        .block {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .block__name {
+            background-color: #362431;
+            border-radius: 4px;
+            height: 100%;
+            width: 167px;
+        }
+
+        .block__team {
+            background-color: #362431;
+            border-radius: 4px;
+            height: 100%;
+            width: 110px;
+        }
+
+        .block__role {
+            background-color: #362431;
+            border-radius: 4px;
+            height: 100%;
+            width: 110px;
+        }
+
+        .block__age {
+            background-color: #362431;
+            border-radius: 4px;
+            height: 100%;
+            width: 55px;
+        }
+
+        .block__country {
+            background-color: #362431;
+            border-radius: 4px;
+            height: 100%;
+            width: 119px;
+        }
+
+        .block__cl {
+            background-color: #362431;
+            border-radius: 4px;
+            height: 100%;
+            width: 110px;
+        }
+
+        .block__cost {
+            background-color: #362431;
+            border-radius: 4px;
+            height: 100%;
+            width: 129px;
+        }
+
+        .football_game {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-self: center;
+            gap: 32px;
+            /* padding: auto;
+            margin: auto; */
+            width: 100%;
+            max-width: 824px;
+            /* height: 100%; */
+            position: absolute;
+            top: 40%;
+            /* margin-left: 20px;
+            margin-right: 20px; */
+        }
+
+        .game {
+            width: 100%;
+            max-width: 824px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .words {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .help {
+            display: flex;
+            flex-direction: row;
+            gap: 7px;
+            align-items: center;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .ellipse {
+            width: 6px;
+            height: 6px;
+        }
+    </style>
 </head>
 
 <body>
-<header>
-
-</header>
 <main>
-    <section class="game">
+    <section class="football_game">
         <div class="words">
             <h1 class="title">Какое то название</h1>
             <h2 class="subtitle">Подзаголовок</h2>
+            <h2 class="subtitle">{{ hidden_player.name }}</h2>
+            <h2 class="subtitle">Попыток {{ attempts }}</h2>
         </div>
-        <input class="input" type="text" name="input" placeholder="Напиши имя игрока..." />
+        <div class="game">
+            <form class="no_form" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input class="input" type="text" name="footballer" id="footballer" placeholder="Напиши имя игрока..."/>
+            </form>
+            {% if selected_players %}
+            <div class="info-panel">
+                <div class="block block__name">
+                    <p>Игрок</p>
+                </div>
+                <div class="block block__team">
+                    <p>Команда</p>
+                </div>
+                <div class="block block__role">
+                    <p>Роль</p>
+                </div>
+                <div class="block block__age">
+                    <p>Возраст</p>
+                </div>
+                <div class="block block__country">
+                    <p>Страна</p>
+                </div>
+                <div class="block block__cl">
+                    <p>ЛЧ</p>
+                </div>
+                <div class="block block__cost">
+                    <p>Цена</p>
+                </div>
+            </div>
+
+            {% for selected_player in selected_players %}
+            <div class="players-panel">
+                <div class="block block__name">
+                    <p>{{ selected_player.name }}</p>
+                </div>
+                <div class="block block__team">
+                    <p>{{ selected_player.team }}</p>
+                </div>
+                <div class="block block__role">
+                    <p>{{ selected_player.role }}</p>
+                </div>
+                <div class="block block__age">
+                    <p>{{ selected_player.age }}</p>
+                </div>
+                <div class="block block__country">
+                    <p>{{ selected_player.country }}</p>
+                </div>
+                <div class="block block__cl">
+                    <p>{{ selected_player.cl }}</p>
+                </div>
+                <div class="block block__cost">
+                    <p>{{ selected_player.cost }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
         <div class="help">
             <a href="#">Как играть</a>
             <img class="ellipse" src="/media/ellipse.svg">
@@ -31,10 +289,32 @@
         </div>
     </section>
 </main>
-
-<footer>
-
-</footer>
 </body>
-
+<script>
+    $(document).ready(function () {
+        $('#footballer').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "{% url 'main:autocomplete' %}",
+                    data: {
+                        'term': request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.label,
+                                value: item.label,
+                                id: item.id
+                            };
+                        }));
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Выбран футболист: " + ui.item.id);
+            }
+        });
+    });
+</script>
 </html>

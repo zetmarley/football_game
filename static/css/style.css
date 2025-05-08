@@ -1,8 +1,7 @@
 * {
     margin: 0;
     padding: 0;
-
-    /* border: solid red 1px; */
+    /*border: 1px red solid;*/
 }
 
 /* @media screen and (max-width: 849px) {
@@ -11,6 +10,12 @@
         padding-right: 75px;
     }
     } */
+
+.no_form {
+    width: 100%;
+    max-width: 700px;
+    max-height: 100%;
+}
 
 .center {
     padding-left: calc(50% - 100px);

@@ -1,8 +1,68 @@
 import os
+import random
 
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
+from django.views.generic import TemplateView
+
 from config.settings import BASE_DIR
+from main.forms import PlayerForm
+from main.models import Player
 
 
-def game(request):
-    return render(request, f"{BASE_DIR}/main/templates/game.html")
+def set_session_value(request):
+    request.session['user'] = {'hidden_player': random.choice(Player.objects.all()),
+                               'selected_players': [],
+                               'attempts': 8}
+    return HttpResponse("Session value set")
+
+
+def get_session_values(request):
+    user = request.session.get('user')
+    return user
+
+
+class GameView(TemplateView):
+    template_name = f"{BASE_DIR}/main/templates/game.html"
+
+    def get(self, request, *args, **kwargs):
+        print('get')
+        if not get_session_values(request):
+            set_session_value(request)
+        context = self.get_context_data(**kwargs)
+        context['selected_players'] = request.session['user']['selected_players']
+        context['hidden_player'] = request.session['user']['hidden_player']
+        context['attempts'] = request.session['user']['attempts']
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        print('post')
+        selected_player = Player.objects.get(name=request.POST.get('footballer'))
+        context = super().get_context_data(**kwargs)
+        selected_players = request.session.get('user')['selected_players']
+        if request.session['user']['hidden_player'] != selected_player:
+            selected_players.append(selected_player)
+            request.session['user']['selected_players'] = selected_players
+            request.session['user']['attempts'] -= 1
+            request.session.save()
+
+        context['hidden_player'] = request.session['user']['hidden_player']
+        context['selected_players'] = request.session['user']['selected_players']
+        context['attempts'] = request.session['user']['attempts']
+
+        print('finish', request.session['user'])
+        return render(request, self.template_name, context)
+
+    # def get(self, request, *args, **kwargs):
+    #     context = self.get_context_data(**kwargs)
+    #     if
+    #     return self.render_to_response(context)
+
+
+def autocomplete(request):
+    if 'term' in request.GET:
+        term = request.GET['term']
+        footballers = Player.objects.filter(name__icontains=term)[:10]
+        results = [{'id': f.id, 'label': f.name} for f in footballers]
+        return JsonResponse(results, safe=False)
+    return JsonResponse([], safe=False)

@@ -12,6 +12,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, verbose_name='почта')
     phone = models.CharField(max_length=12, verbose_name='номер телефона', **NULLABLE)
 
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     def __str__(self):
