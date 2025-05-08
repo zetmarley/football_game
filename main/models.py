@@ -14,6 +14,7 @@ class Player(models.Model):
     age = models.PositiveIntegerField(verbose_name='Возраст')
     country = models.CharField(max_length=50, verbose_name='Страна')
     cost = models.CharField(max_length=50, verbose_name='Цена')
+    photo_path = models.FilePathField(verbose_name='Путь до фото', **NULLABLE)
 
 
     def __str__(self):
