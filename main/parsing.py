@@ -2,6 +2,22 @@ import requests
 from bs4 import BeautifulSoup
 from main.models import Player
 
+def reform_role(role):
+    try:
+        if 'вратарь' in role.lower():
+            done_role = 'ВРТ'
+        elif len(role.split(' ')) == 2:
+            role = role.split(' ')
+            if 'полузащитник' in role[1].lower():
+                role[1] = 'ПЗ'
+                done_role = role[0][0] + role[1]
+            else:
+                role[1] = role[1].title()
+                done_role = role[0][0] + role[1][0]
+        return done_role
+    except UnboundLocalError:
+        return '-'
+
 def players_parsing():
 
     headers = {
@@ -13,6 +29,7 @@ def players_parsing():
     players = []
 
     for page in pages:
+        print(f'Parsing... Page: {page}/20')
         url = f'https://www.transfermarkt.world/spieler-statistik/wertvollstespieler/marktwertetop?ajax=yw1&altersklasse=alle&ausrichtung=alle&jahrgang=0&kontinent_id=0&land_id=0&page={page}&plus=1&spielerposition_id=alle'
         response = requests.get(url, headers=headers)
 
@@ -33,7 +50,7 @@ def players_parsing():
                 players_count += 1
                 players_data1 = {'id': index,
                                 'name': name,
-                                'role': role,
+                                'role': reform_role(role),
                                  'cl': 0}
                 players.append(players_data1)
 
@@ -94,3 +111,4 @@ def players_parsing():
                 'cost': i['cost']
             }
         )
+    print(f'Parsing completed!')

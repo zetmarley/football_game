@@ -8,7 +8,7 @@
     <title>football</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
           rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
@@ -45,9 +45,10 @@
         }
 
         body {
-            background-color: #1D1B20;
-            font-family: "Roboto", sans-serif;
+            background-color: #242426;
+            font-family: "Sansation", sans-serif;
             color: white;
+            letter-spacing: 0.1px;
         }
 
         .title {
@@ -56,14 +57,14 @@
             letter-spacing: Label Large/Tracking;
             text-align: center;
             vertical-align: middle;
-            font-weight: 500;
+            /*font-weight: 500;*/
             font-style: normal;
             font-variation-settings: "wdth" 100;
             width: 100%;
         }
 
         .subtitle {
-            font-weight: 400;
+            font-weight: 300;
             font-size: 16px;
             /* line-height: Label Large/Line Height; */
             /* letter-spacing: Label Large/Tracking; */
@@ -83,6 +84,11 @@
             background-position-y: 50%;
             color: black;
             padding-left: 17px;
+        }
+
+        .input::placeholder {
+            font-family: "Sansation", sans-serif;
+            font-size: 14px;
         }
 
         .info-panel {
@@ -106,57 +112,60 @@
             background-color: transparent;
             border-radius: 4px;
         }
+
         .block {
+            background-color: #362431;
             text-align: center;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
+        .green {
+            background-color: #214D3B;
+        }
+
+        .yellow {
+            background-color: #FE993E;
+        }
+
         .block__name {
-            background-color: #362431;
             border-radius: 4px;
             height: 100%;
             width: 167px;
         }
 
         .block__team {
-            background-color: #362431;
             border-radius: 4px;
             height: 100%;
             width: 110px;
         }
 
         .block__role {
-            background-color: #362431;
             border-radius: 4px;
             height: 100%;
             width: 110px;
         }
 
         .block__age {
-            background-color: #362431;
             border-radius: 4px;
             height: 100%;
             width: 55px;
         }
 
         .block__country {
-            background-color: #362431;
             border-radius: 4px;
             height: 100%;
             width: 119px;
         }
 
         .block__cl {
-            background-color: #362431;
             border-radius: 4px;
             height: 100%;
             width: 110px;
         }
 
         .block__cost {
-            background-color: #362431;
             border-radius: 4px;
             height: 100%;
             width: 129px;
@@ -205,7 +214,7 @@
         a {
             text-decoration: none;
             color: white;
-            font-weight: 500;
+            /*font-weight: 500;*/
         }
 
         .ellipse {
@@ -260,33 +269,57 @@
                 <div class="block block__name">
                     <p>{{ selected_player.name }}</p>
                 </div>
-                <div class="block block__team">
-                    <p>{{ selected_player.team }}</p>
+                {% if hidden_player.team == selected_player.team %}
+                <div class="block block__team green">
+                    {% elif hidden_player.team != selected_player.team %}
+                    <div class="block block__team">
+                        {% endif %}
+                        <p>{{ selected_player.team }}</p>
+                    </div>
+                    {% if hidden_player.role == selected_player.role %}
+                    <div class="block block__role green">
+                        {% elif hidden_player.role != selected_player.role %}
+                        <div class="block block__role">
+                            {% endif %}
+                            <p>{{ selected_player.role }}</p>
+                        </div>
+                        {% if hidden_player.age == selected_player.age %}
+                        <div class="block block__age green">
+                            {% elif hidden_player.age != selected_player.age %}
+                            <div class="block block__age yellow">
+                                {% endif %}
+                            <p>{{ selected_player.age }}</p>
+                        </div>
+                            {% if hidden_player.country == selected_player.country %}
+                        <div class="block block__country green">
+                            {% elif hidden_player.country != selected_player.country %}
+                            <div class="block block__country">
+                                {% endif %}
+                            <p>{{ selected_player.country }}</p>
+                        </div>
+                            {% if hidden_player.cl == selected_player.cl %}
+                        <div class="block block__cl green">
+                            {% elif hidden_player.cl != selected_player.cl %}
+                            <div class="block block__cl yellow">
+                                {% endif %}
+                            <p>{{ selected_player.cl }}</p>
+                        </div>
+                            {% if hidden_player.cost == selected_player.cost %}
+                        <div class="block block__cost green">
+                            {% elif hidden_player.cost != selected_player.cost %}
+                            <div class="block block__cost yellow">
+                                {% endif %}
+                            <p>{{ selected_player.cost }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
                 </div>
-                <div class="block block__role">
-                    <p>{{ selected_player.role }}</p>
+                <div class="help">
+                    <a href="#">Как играть</a>
+                    <img class="ellipse" src="/media/ellipse.svg">
+                    <a href="#">Моя статистика</a>
                 </div>
-                <div class="block block__age">
-                    <p>{{ selected_player.age }}</p>
-                </div>
-                <div class="block block__country">
-                    <p>{{ selected_player.country }}</p>
-                </div>
-                <div class="block block__cl">
-                    <p>{{ selected_player.cl }}</p>
-                </div>
-                <div class="block block__cost">
-                    <p>{{ selected_player.cost }}</p>
-                </div>
-            </div>
-            {% endfor %}
-            {% endif %}
-        </div>
-        <div class="help">
-            <a href="#">Как играть</a>
-            <img class="ellipse" src="/media/ellipse.svg">
-            <a href="#">Моя статистика</a>
-        </div>
     </section>
 </main>
 </body>
