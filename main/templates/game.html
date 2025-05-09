@@ -1,4 +1,5 @@
 {% load static %}
+{% load range %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -119,6 +120,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            gap: 3px;
         }
 
         .green {
@@ -221,6 +223,35 @@
             width: 6px;
             height: 6px;
         }
+
+        .arrow {
+            /*width: 7.5px;*/
+            /*height: 3.5px;*/
+        }
+
+        .rotate {
+            transform: rotate(180deg);
+        }
+
+        .finish {
+            display: flex;
+            flex-direction: column;
+            max-width: 510px;
+            width: 100%;
+            max-height: 566px;
+            height: 100%;
+            background-color: #242426;
+            border: none;
+            border-radius: 24px;
+            color: white;
+        }
+
+        .attempt {
+            width: 12px;
+            height: 4px;
+            border-radius: 5px;
+        }
+
     </style>
 </head>
 
@@ -231,7 +262,6 @@
             <h1 class="title">Какое то название</h1>
             <h2 class="subtitle">Подзаголовок</h2>
             <h2 class="subtitle">{{ hidden_player.name }}</h2>
-            <h2 class="subtitle">Попыток {{ attempts }}</h2>
         </div>
         <div class="game">
             <form class="no_form" method="POST">
@@ -239,6 +269,16 @@
                 {{ form.as_p }}
                 <input class="input" type="text" name="footballer" id="footballer" placeholder="Напиши имя игрока..."/>
             </form>
+            <div class="attempts">
+                {% for attempt in attempts|range %}
+                <div class="attempt"></div>
+                {% endfor %}
+            </div>
+<!--            <button type="button" onclick="window.myDialog.showModal()">-->
+<!--                Открыть как модалку-->
+<!--            </button>-->
+<!--            <dialog class="finish" id="myDialog">🖖 Живи долго и процветай!</dialog>-->
+
             {% if selected_players %}
             <div class="info-panel">
                 <div class="block block__name">
@@ -288,38 +328,53 @@
                             {% elif hidden_player.age != selected_player.age %}
                             <div class="block block__age yellow">
                                 {% endif %}
-                            <p>{{ selected_player.age }}</p>
-                        </div>
+                                <p>{{ selected_player.age }}</p>
+                                {% if hidden_player.age > selected_player.age %}
+                                <img class="arrow" src="/media/arrow.svg">
+                                {% elif hidden_player.age < selected_player.age %}
+                                <img class="arrow rotate" src="/media/arrow.svg">
+                                {% endif %}
+                            </div>
                             {% if hidden_player.country == selected_player.country %}
-                        <div class="block block__country green">
-                            {% elif hidden_player.country != selected_player.country %}
-                            <div class="block block__country">
-                                {% endif %}
-                            <p>{{ selected_player.country }}</p>
-                        </div>
-                            {% if hidden_player.cl == selected_player.cl %}
-                        <div class="block block__cl green">
-                            {% elif hidden_player.cl != selected_player.cl %}
-                            <div class="block block__cl yellow">
-                                {% endif %}
-                            <p>{{ selected_player.cl }}</p>
-                        </div>
-                            {% if hidden_player.cost == selected_player.cost %}
-                        <div class="block block__cost green">
-                            {% elif hidden_player.cost != selected_player.cost %}
-                            <div class="block block__cost yellow">
-                                {% endif %}
-                            <p>{{ selected_player.cost }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-                <div class="help">
-                    <a href="#">Как играть</a>
-                    <img class="ellipse" src="/media/ellipse.svg">
-                    <a href="#">Моя статистика</a>
-                </div>
+                            <div class="block block__country green">
+                                {% elif hidden_player.country != selected_player.country %}
+                                <div class="block block__country">
+                                    {% endif %}
+                                    <p>{{ selected_player.country }}</p>
+                                </div>
+                                {% if hidden_player.cl == selected_player.cl %}
+                                <div class="block block__cl green">
+                                    {% elif hidden_player.cl != selected_player.cl %}
+                                    <div class="block block__cl yellow">
+                                        {% endif %}
+                                        <p>{{ selected_player.cl }}</p>
+                                        {% if hidden_player.cl > selected_player.cl %}
+                                        <img class="arrow" src="/media/arrow.svg">
+                                        {% elif hidden_player.cl < selected_player.cl %}
+                                        <img class="arrow rotate" src="/media/arrow.svg">
+                                        {% endif %}
+                                    </div>
+                                    {% if hidden_player.cost == selected_player.cost %}
+                                    <div class="block block__cost green">
+                                        {% elif hidden_player.cost != selected_player.cost %}
+                                        <div class="block block__cost yellow">
+                                            {% endif %}
+                                            <p>{{ selected_player.cost }}</p>
+                                            {% if hidden_player.cost > selected_player.cost %}
+                                            <img class="arrow" src="/media/arrow.svg">
+                                            {% elif hidden_player.cost < selected_player.cost %}
+                                            <img class="arrow rotate" src="/media/arrow.svg">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="help">
+                                    <a href="#">Как играть</a>
+                                    <img class="ellipse" src="/media/ellipse.svg">
+                                    <a href="#">Моя статистика</a>
+                                </div>
     </section>
 </main>
 </body>

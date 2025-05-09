@@ -30,8 +30,8 @@ def players_parsing():
         "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0"
     }
 
-    players_counting = (lambda: [1 + 25 * i for i in range(1)])()
-    pages = [1 + i for i in range(1)]
+    players_counting = (lambda: [1 + 25 * i for i in range(20)])()
+    pages = [1 + i for i in range(20)]
     players = []
     player_profiles_links = []
     for page in pages:
@@ -110,33 +110,31 @@ def players_parsing():
         for link in player_profiles_links:
             profiles_response = requests.get(link, headers=headers)
             soup = BeautifulSoup(profiles_response.text, "lxml")
-            cl = soup.find_all('img')
-            for i in cl:
-                if i.get('alt') == 'Победитель Лиги Чемпионов':
-                    cl_done = int(i.next_element.next_element.text)
+            try:
+                profile = soup.find('div', class_='modal__content')
+                profile = profile.find('img')
+                name = profile.get('alt')
+                player = Player.objects.get(name=name)
 
-            profile = soup.find('div', class_='modal__content')
-            profile = profile.find('img')
-            name = profile.get('alt')
-            if '' in name:
-                name = name
-            photo = profile.get('src').replace('?lm=1', '')
-            photo_path = f'{MEDIA_ROOT}/players/{name.replace(' ', '_')}.png'
+                photo = profile.get('src').replace('?lm=1', '')
+                photo_path = f'{MEDIA_ROOT}/players/{name.replace(' ', '_')}.png'
 
-            if not os.path.exists(photo_path):
-                with open(photo_path, "wb") as f:
-                    f.write(requests.get(photo).content)
-                    print(f'Photo {name} saved')
+                if not os.path.exists(photo_path):
+                    with open(photo_path, "wb") as f:
+                        f.write(requests.get(photo).content)
+                        print(f'Photo {name} saved')
+                player.photo_path = photo_path
 
-            player = Player.objects.get(name=name)
-            if cl_done > 0:
-                player.cl = cl_done
-                print(cl_done) """ХУЙНЯ НЕ РАБОЧАЯ"""
-            else:
-                player.cl = 0
-                print('fuck')
-            player.photo_path = photo_path
-            player.save()
+                cl = soup.find_all('img')
+                for i in cl:
+                    if i.get('alt') == 'Победитель Лиги Чемпионов':
+                        cl_done = int(i.next_element.next_element.text)
+                        player.cl = cl_done
+
+                player.save()
+            except AttributeError:
+                print(soup.find('div', class_='modal__content'))
+
 
     for i in players:
         Player.objects.update_or_create(
@@ -144,7 +142,7 @@ def players_parsing():
             defaults={
                 'team': i['team'],
                 'role': i['role'],
-                'cl': int(i['cl']),
+                # 'cl': int(i['cl']),
                 'age': int(i['age']),
                 'country': i['country'],
                 'cost': i['cost']
