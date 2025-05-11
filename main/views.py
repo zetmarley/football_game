@@ -1,19 +1,19 @@
 import os
 import random
-
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
-
 from config.settings import BASE_DIR
 from main.forms import PlayerForm
 from main.models import Player
 
 
 def set_session_value(request):
-    request.session['user'] = {'hidden_player': random.choice(Player.objects.all()),
+    # request.session['user'] = {'hidden_player': random.choice(Player.objects.all()),
+    request.session['user'] = {'hidden_player': Player.objects.get(name='Marc Guéhi'),
                                'selected_players': [],
-                               'attempts': 8}
+                               'attempts': 8,
+                               'show_dialog': False}
     return HttpResponse("Session value set")
 
 
@@ -26,17 +26,26 @@ class GameView(TemplateView):
     template_name = f"{BASE_DIR}/main/templates/game.html"
 
     def get(self, request, *args, **kwargs):
-        print('get')
         if not get_session_values(request):
             set_session_value(request)
         context = self.get_context_data(**kwargs)
         context['selected_players'] = request.session['user']['selected_players']
         context['hidden_player'] = request.session['user']['hidden_player']
         context['attempts'] = request.session['user']['attempts']
+        context['show_dialog '] = request.session['user']['show_dialog']
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        print('post')
+        if request.session['user']['attempts'] == 0:
+            set_session_value(request)
+            GameView.get(request, *args, **kwargs)
+            # set_session_value(request)
+            # context = self.get_context_data(**kwargs)
+            # context['selected_players'] = request.session['user']['selected_players']
+            # context['hidden_player'] = request.session['user']['hidden_player']
+            # context['attempts'] = request.session['user']['attempts']
+            # context['show_dialog '] = request.session['user']['show_dialog']
+            # return self.render_to_response(context)
         selected_player = Player.objects.get(name=request.POST.get('footballer'))
         context = super().get_context_data(**kwargs)
         selected_players = request.session.get('user')['selected_players']
@@ -45,18 +54,17 @@ class GameView(TemplateView):
             request.session['user']['selected_players'] = selected_players
             request.session['user']['attempts'] -= 1
             request.session.save()
+        else:
+            selected_players.append(selected_player)
+            request.session['user']['selected_players'] = selected_players
+            request.session.save()
 
         context['hidden_player'] = request.session['user']['hidden_player']
         context['selected_players'] = request.session['user']['selected_players']
         context['attempts'] = request.session['user']['attempts']
+        context['show_dialog '] = request.session['user']['show_dialog']
 
-        print('finish', request.session['user'])
         return render(request, self.template_name, context)
-
-    # def get(self, request, *args, **kwargs):
-    #     context = self.get_context_data(**kwargs)
-    #     if
-    #     return self.render_to_response(context)
 
 
 def autocomplete(request):

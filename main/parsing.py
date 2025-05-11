@@ -1,4 +1,5 @@
 import os
+import time
 from os.path import basename
 
 import requests
@@ -26,6 +27,7 @@ def reform_role(role):
 
 
 def players_parsing():
+    start_time = time.time()
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0"
     }
@@ -43,9 +45,9 @@ def players_parsing():
         links = soup.find_all('td', class_="hauptlink")
         costs = soup.find_all('td', class_="rechts hauptlink")
         name_n_role = soup.find_all('table', class_='inline-table')
-        commands = soup.find_all('td', class_='zentriert')
-        ages = soup.find_all('td', class_="zentriert")
-        countries = soup.find_all('td', class_="zentriert")
+        team_age_country = soup.find_all('td', class_='zentriert')  # commands
+        # ages = soup.find_all('td', class_="zentriert") #ages
+        # countries = soup.find_all('td', class_="zentriert") #countries
 
         players_count = players_counting[pages.index(page)]
         for nr in name_n_role:
@@ -62,10 +64,10 @@ def players_parsing():
 
         players_count = players_counting[pages.index(page)]
 
-        for cmnd in commands:
-            if cmnd.find_all('a'):
+        for team in team_age_country:
+            if team.find_all('a'):
                 index = players_count
-                team = cmnd.find('a').get('title')
+                team = team.find('a').get('title')
                 players_count += 1
                 for i in players:
                     if i['id'] == index:
@@ -74,10 +76,10 @@ def players_parsing():
         count = 0
         players_count = players_counting[pages.index(page)]
 
-        for i in ages:
+        for i in team_age_country:
             if i.find('img'):
-                if ages[count - 1].text != '':
-                    age = ages[count - 1].text
+                if team_age_country[count - 1].text != '':
+                    age = team_age_country[count - 1].text
                     for i in players:
                         if i['id'] == players_count:
                             i['age'] = age
@@ -95,7 +97,7 @@ def players_parsing():
             players_count += 1
 
         players_count = players_counting[pages.index(page)]
-        for c in countries:
+        for c in team_age_country:
             if c.find('img', class_="flaggenrahmen"):
                 country = c.find('img', class_="flaggenrahmen").get('alt')
                 for i in players:
@@ -107,7 +109,29 @@ def players_parsing():
             if 'profil/spieler' in l.find('a')['href']:
                 player_profiles_links.append(f'https://www.transfermarkt.world{l.find('a')['href']}')
 
+    for i in players:
+        Player.objects.update_or_create(
+            name=i['name'],
+            defaults={
+                'team': i['team'],
+                'role': i['role'],
+                'cl': 0,
+                'age': int(i['age']),
+                'country': i['country'],
+                'cost': i['cost']
+            }
+        )
+
+    print('Photo and CL parsing...')
+    count_circles = 0
+
+    while len(player_profiles_links) != 0:
         for link in player_profiles_links:
+            count_circles += 1
+            middle_time = time.time()
+            middle_execution_time = middle_time - start_time
+            print(f'Circle: {count_circles}| links: {player_profiles_links.index(link)}/{len(player_profiles_links)}')
+            print(f'{middle_execution_time:.4f} seconds')
             profiles_response = requests.get(link, headers=headers)
             soup = BeautifulSoup(profiles_response.text, "lxml")
             try:
@@ -122,8 +146,10 @@ def players_parsing():
                 if not os.path.exists(photo_path):
                     with open(photo_path, "wb") as f:
                         f.write(requests.get(photo).content)
-                        print(f'Photo {name} saved')
-                player.photo_path = photo_path
+                        print(f'Photo {name} saved {player_profiles_links.index(link)}/{len(player_profiles_links)}')
+                else:
+                    print(f'Photo {name} updated {player_profiles_links.index(link)}/{len(player_profiles_links)}')
+                player.photo_path = f'/media/players/{name.replace(' ', '_')}.png'
 
                 cl = soup.find_all('img')
                 for i in cl:
@@ -132,20 +158,13 @@ def players_parsing():
                         player.cl = cl_done
 
                 player.save()
+                player_profiles_links.remove(link)
+
             except AttributeError:
-                print(soup.find('div', class_='modal__content'))
-
-
-    for i in players:
-        Player.objects.update_or_create(
-            name=i['name'],
-            defaults={
-                'team': i['team'],
-                'role': i['role'],
-                # 'cl': int(i['cl']),
-                'age': int(i['age']),
-                'country': i['country'],
-                'cost': i['cost']
-            }
-        )
-    print(f'Parsing completed!')
+                print('Error, Repeat')
+            except Player.DoesNotExist:
+                player_profiles_links.remove(link)
+                print('Player not exists')
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f'Parsing completed! {execution_time:.4f} seconds')

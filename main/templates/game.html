@@ -1,5 +1,6 @@
 {% load static %}
-{% load range %}
+{% load make_list %}
+{% load win_or_not %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -233,23 +234,166 @@
             transform: rotate(180deg);
         }
 
-        .finish {
-            display: flex;
-            flex-direction: column;
+        .dialog {
             max-width: 510px;
             width: 100%;
             max-height: 566px;
             height: 100%;
             background-color: #242426;
-            border: none;
             border-radius: 24px;
             color: white;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            padding: 30px 24px;
+            box-sizing: border-box;
+        }
+
+        .result {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .exit-button {
+            width: 44px;
+            height: 44px;
+            background-image: url("/media/exit_button.svg");
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            align-self: end;
+        }
+
+        .gif-attempts_words {
+            width: 100%;
+            height: 204px;
+            display: flex;
+            flex-direction: column;
+        {#justify-content: space-between;#} align-items: center;
+            gap: 12px;
+        }
+
+        .gif {
+            width: 100px;
+            height: 100px;
+        }
+
+        .result-words {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 64px;
+            padding-top: 12px;
+            font-size: 32px;
+            line-height: 30px;
+            text-align: center;
+        }
+
+        .player-info {
+            width: 100%;
+        {#height: 154px;#} margin: 12px;
+            display: flex;
+            flex-direction: row;
+            gap: 24px;
+        }
+
+        .player-pic {
+            width: 130px;
+            height: 130px;
+            border-radius: 6px;
+        }
+
+        .player-text {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .player-title {
+            display: flex;
+            flex-direction: row;
+            font-size: 24px;
+        }
+
+        .player-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .player-stat {
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            font-size: 16px;
+        }
+
+        .player-stat-word {
+            font-family: "Sansation", light;
+        }
+
+        .repeate-game {
+            width: 100%;
+            height: 32px;
+            gap: 12px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+
+        .repeate-game-close-button {
+            display: inline-flex;
+            height: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
+            background-color: rgb(255, 255, 255, 5%);
+            color: white;
+            border-radius: 14px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .repeate-game-button {
+            display: inline-flex;
+            height: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
+            background-color: #FFFFFF;
+            color: black;
+            border-radius: 14px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .attempts {
+            width: 100%;
+            max-width: 824px;
+            display: flex;
+            flex-direction: row;
+            gap: 2px;
+            justify-content: center;
         }
 
         .attempt {
             width: 12px;
             height: 4px;
             border-radius: 5px;
+            background-color: #444446;
+        }
+
+        .failed {
+            background-color: #EA2D2C;
         }
 
     </style>
@@ -270,111 +414,170 @@
                 <input class="input" type="text" name="footballer" id="footballer" placeholder="Напиши имя игрока..."/>
             </form>
             <div class="attempts">
-                {% for attempt in attempts|range %}
-                <div class="attempt"></div>
+                {% for attempt in attempts|make_list %}
+                    {% if attempt == 1 %}
+                        <div class="attempt failed"></div>
+                    {% elif attempt == 0 %}
+                        <div class="attempt"></div>
+                    {% endif %}
                 {% endfor %}
             </div>
-<!--            <button type="button" onclick="window.myDialog.showModal()">-->
-<!--                Открыть как модалку-->
-<!--            </button>-->
-<!--            <dialog class="finish" id="myDialog">🖖 Живи долго и процветай!</dialog>-->
-
-            {% if selected_players %}
-            <div class="info-panel">
-                <div class="block block__name">
-                    <p>Игрок</p>
-                </div>
-                <div class="block block__team">
-                    <p>Команда</p>
-                </div>
-                <div class="block block__role">
-                    <p>Роль</p>
-                </div>
-                <div class="block block__age">
-                    <p>Возраст</p>
-                </div>
-                <div class="block block__country">
-                    <p>Страна</p>
-                </div>
-                <div class="block block__cl">
-                    <p>ЛЧ</p>
-                </div>
-                <div class="block block__cost">
-                    <p>Цена</p>
-                </div>
-            </div>
-
-            {% for selected_player in selected_players %}
-            <div class="players-panel">
-                <div class="block block__name">
-                    <p>{{ selected_player.name }}</p>
-                </div>
-                {% if hidden_player.team == selected_player.team %}
-                <div class="block block__team green">
-                    {% elif hidden_player.team != selected_player.team %}
-                    <div class="block block__team">
-                        {% endif %}
-                        <p>{{ selected_player.team }}</p>
-                    </div>
-                    {% if hidden_player.role == selected_player.role %}
-                    <div class="block block__role green">
-                        {% elif hidden_player.role != selected_player.role %}
-                        <div class="block block__role">
-                            {% endif %}
-                            <p>{{ selected_player.role }}</p>
-                        </div>
-                        {% if hidden_player.age == selected_player.age %}
-                        <div class="block block__age green">
-                            {% elif hidden_player.age != selected_player.age %}
-                            <div class="block block__age yellow">
-                                {% endif %}
-                                <p>{{ selected_player.age }}</p>
-                                {% if hidden_player.age > selected_player.age %}
-                                <img class="arrow" src="/media/arrow.svg">
-                                {% elif hidden_player.age < selected_player.age %}
-                                <img class="arrow rotate" src="/media/arrow.svg">
+            {% if hidden_player in selected_players or attempts == 0 %}
+                <dialog open class="dialog" id="myDialog">
+                    <div class="result">
+                        <a onclick="document.getElementById('myDialog').close()" class="exit-button"></a>
+                        <div class="gif-attempts_words">
+                            <img class="gif" src="/media/gifs/gif.svg">
+                            <div class="attempts">
+                                {% for attempt in attempts|make_list %}
+                                    {% if attempt == 1 %}
+                                        <div class="attempt failed"></div>
+                                    {% elif attempt == 0 %}
+                                        <div class="attempt"></div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="result-words">
+                                {% if attempts == 0 %}
+                                    <p>Автогол! 🥅</p>
+                                    <p>Попробуй другого игрока!</p>
+                                {% elif attempts > 0 %}
+                                    <p>В точку! 🎯 </p>
+                                    <p>Ты угадал футболиста!</p>
                                 {% endif %}
                             </div>
-                            {% if hidden_player.country == selected_player.country %}
-                            <div class="block block__country green">
-                                {% elif hidden_player.country != selected_player.country %}
-                                <div class="block block__country">
-                                    {% endif %}
-                                    <p>{{ selected_player.country }}</p>
+                        </div>
+                        <div class="player-info">
+                            <img class="player-pic" src={{ hidden_player.photo_path }}>
+                            <div class="player-text">
+                                <div class="player-title">
+                                    <p>{{ hidden_player.name }} | </p>
+                                    <p> {{ hidden_player.country }}</p>
                                 </div>
-                                {% if hidden_player.cl == selected_player.cl %}
-                                <div class="block block__cl green">
-                                    {% elif hidden_player.cl != selected_player.cl %}
-                                    <div class="block block__cl yellow">
-                                        {% endif %}
-                                        <p>{{ selected_player.cl }}</p>
-                                        {% if hidden_player.cl > selected_player.cl %}
-                                        <img class="arrow" src="/media/arrow.svg">
-                                        {% elif hidden_player.cl < selected_player.cl %}
-                                        <img class="arrow rotate" src="/media/arrow.svg">
-                                        {% endif %}
+                                <div class="player-details">
+                                    <div class="player-stat">
+                                        <p class="player-stat-word">Команда</p>
+                                        <p>{{ hidden_player.team }}</p>
                                     </div>
-                                    {% if hidden_player.cost == selected_player.cost %}
-                                    <div class="block block__cost green">
-                                        {% elif hidden_player.cost != selected_player.cost %}
-                                        <div class="block block__cost yellow">
-                                            {% endif %}
-                                            <p>{{ selected_player.cost }}</p>
-                                            {% if hidden_player.cost > selected_player.cost %}
-                                            <img class="arrow" src="/media/arrow.svg">
-                                            {% elif hidden_player.cost < selected_player.cost %}
-                                            <img class="arrow rotate" src="/media/arrow.svg">
-                                            {% endif %}
-                                        </div>
+                                    <div class="player-stat">
+                                        <p class="player-stat-word">Позиция</p>
+                                        <p>{{ hidden_player.role }}</p>
                                     </div>
-                                    {% endfor %}
-                                    {% endif %}
+                                    <div class="player-stat">
+                                        <p class="player-stat-word">Возраст</p>
+                                        <p>{{ hidden_player.age }}</p>
+                                    </div>
+                                    <div class="player-stat">
+                                        <p class="player-stat-word">Лига чемпионов</p>
+                                        <p>{{ hidden_player.cl }}</p>
+                                    </div>
                                 </div>
-                                <div class="help">
-                                    <a href="#">Как играть</a>
-                                    <img class="ellipse" src="/media/ellipse.svg">
-                                    <a href="#">Моя статистика</a>
-                                </div>
+                            </div>
+                        </div>
+                        <div class="repeate-game">
+                            <a class="repeate-game-close-button" onclick="document.getElementById('myDialog').close()">Закрыть</a>
+                            <a class="repeate-game-button" href="{% url 'main:game'%}">Играть ещё раз</a>
+                        </div>
+                    </div>
+                </dialog>
+            {% endif %}
+
+            {% if selected_players %}
+                <div class="info-panel">
+                    <div class="block block__name">
+                        <p>Игрок</p>
+                    </div>
+                    <div class="block block__team">
+                        <p>Команда</p>
+                    </div>
+                    <div class="block block__role">
+                        <p>Роль</p>
+                    </div>
+                    <div class="block block__age">
+                        <p>Возраст</p>
+                    </div>
+                    <div class="block block__country">
+                        <p>Страна</p>
+                    </div>
+                    <div class="block block__cl">
+                        <p>ЛЧ</p>
+                    </div>
+                    <div class="block block__cost">
+                        <p>Цена</p>
+                    </div>
+                </div>
+
+                {% for selected_player in selected_players %}
+                    <div class="players-panel">
+                    <div class="block block__name">
+                        <p>{{ selected_player.name }}</p>
+                    </div>
+                    {% if hidden_player.team == selected_player.team %}
+                        <div class="block block__team green">
+                    {% elif hidden_player.team != selected_player.team %}
+                        <div class="block block__team">
+                    {% endif %}
+                <p>{{ selected_player.team }}</p>
+                </div>
+                    {% if hidden_player.role == selected_player.role %}
+                        <div class="block block__role green">
+                    {% elif hidden_player.role != selected_player.role %}
+                        <div class="block block__role">
+                    {% endif %}
+                <p>{{ selected_player.role }}</p>
+                </div>
+                    {% if hidden_player.age == selected_player.age %}
+                        <div class="block block__age green">
+                    {% elif hidden_player.age != selected_player.age %}
+                        <div class="block block__age yellow">
+                    {% endif %}
+                <p>{{ selected_player.age }}</p>
+                {% if hidden_player.age > selected_player.age %}
+                    <img class="arrow" src="/media/arrow.svg">
+                {% elif hidden_player.age < selected_player.age %}
+                    <img class="arrow rotate" src="/media/arrow.svg">
+                {% endif %}
+                </div>
+                    {% if hidden_player.country == selected_player.country %}
+                        <div class="block block__country green">
+                    {% elif hidden_player.country != selected_player.country %}
+                        <div class="block block__country">
+                    {% endif %}
+                <p>{{ selected_player.country }}</p>
+                </div>
+                    {% if hidden_player.cl == selected_player.cl %}
+                        <div class="block block__cl green">
+                    {% elif hidden_player.cl != selected_player.cl %}
+                        <div class="block block__cl yellow">
+                    {% endif %}
+                <p>{{ selected_player.cl }}</p>
+                {% if hidden_player.cl > selected_player.cl %}
+                    <img class="arrow" src="/media/arrow.svg">
+                {% elif hidden_player.cl < selected_player.cl %}
+                    <img class="arrow rotate" src="/media/arrow.svg">
+                {% endif %}
+                </div>
+                    {% if hidden_player.cost == selected_player.cost %}
+                        <div class="block block__cost green">
+                    {% elif hidden_player.cost != selected_player.cost %}
+                        <div class="block block__cost yellow">
+                    {% endif %}
+                <p>{{ selected_player.cost }}</p>
+                {% if hidden_player.cost > selected_player.cost %}
+                    <img class="arrow" src="/media/arrow.svg">
+                {% elif hidden_player.cost < selected_player.cost %}
+                    <img class="arrow rotate" src="/media/arrow.svg">
+                {% endif %}
+                </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+            </div>
+            <div class="help">
+                <a href="#">Как играть</a>
+                <img class="ellipse" src="/media/ellipse.svg">
+                <a href="#">Моя статистика</a>
+            </div>
     </section>
 </main>
 </body>
@@ -395,6 +598,7 @@
                                 id: item.id
                             };
                         }));
+
                     }
                 });
             },
@@ -403,6 +607,12 @@
                 console.log("Выбран футболист: " + ui.item.id);
             }
         });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dialog = document.getElementById('myDialog');
+        dialog.showModal();
     });
 </script>
 </html>
