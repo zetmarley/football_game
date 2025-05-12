@@ -32,8 +32,8 @@ def players_parsing():
         "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0"
     }
 
-    players_counting = (lambda: [1 + 25 * i for i in range(20)])()
-    pages = [1 + i for i in range(20)]
+    players_counting = (lambda: [1 + 25 * i for i in range(1)])()
+    pages = [1 + i for i in range(1)]
     players = []
     player_profiles_links = []
     for page in pages:
@@ -165,6 +165,8 @@ def players_parsing():
             except Player.DoesNotExist:
                 player_profiles_links.remove(link)
                 print('Player not exists')
+            except requests.exceptions.ChunkedEncodingError:
+                print('I dont give a fuck, man')
     end_time = time.time()
     execution_time = end_time - start_time
     print(f'Parsing completed! {execution_time:.4f} seconds')
