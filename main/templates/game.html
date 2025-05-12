@@ -1,6 +1,9 @@
 {% load static %}
 {% load make_list %}
-{% load win_or_not %}
+{% load flag_tag %}
+{% load logo_tag %}
+{% load new_game %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -385,6 +388,11 @@
             justify-content: center;
         }
 
+        .in-game {
+            padding-top: 20px;
+            padding-bottom: 10px;
+        }
+
         .attempt {
             width: 12px;
             height: 4px;
@@ -396,6 +404,17 @@
             background-color: #EA2D2C;
         }
 
+        .flag {
+            width: 16px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .logo {
+            width: 16px;
+            height: 16px;
+        }
+
     </style>
 </head>
 
@@ -405,7 +424,7 @@
         <div class="words">
             <h1 class="title">Какое то название</h1>
             <h2 class="subtitle">Подзаголовок</h2>
-            <h2 class="subtitle">{{ hidden_player.name }}</h2>
+{#            <h2 class="subtitle">{{ hidden_player.name }}</h2>#}
         </div>
         <div class="game">
             <form class="no_form" method="POST">
@@ -413,17 +432,8 @@
                 {{ form.as_p }}
                 <input class="input" type="text" name="footballer" id="footballer" placeholder="Напиши имя игрока..."/>
             </form>
-            <div class="attempts">
-                {% for attempt in attempts|make_list %}
-                    {% if attempt == 1 %}
-                        <div class="attempt failed"></div>
-                    {% elif attempt == 0 %}
-                        <div class="attempt"></div>
-                    {% endif %}
-                {% endfor %}
-            </div>
             {% if hidden_player in selected_players or attempts == 0 %}
-                <dialog open class="dialog" id="myDialog">
+                <dialog class="dialog" id="myDialog">
                     <div class="result">
                         <a onclick="document.getElementById('myDialog').close()" class="exit-button"></a>
                         <div class="gif-attempts_words">
@@ -452,12 +462,12 @@
                             <div class="player-text">
                                 <div class="player-title">
                                     <p>{{ hidden_player.name }} | </p>
-                                    <p> {{ hidden_player.country }}</p>
+                                    <img class="flag" src="{{ selected_player.country|flag_tag }}">
                                 </div>
                                 <div class="player-details">
                                     <div class="player-stat">
                                         <p class="player-stat-word">Команда</p>
-                                        <p>{{ hidden_player.team }}</p>
+                                        <img class="logo" src="{{ selected_player.team|logo_tag }}">
                                     </div>
                                     <div class="player-stat">
                                         <p class="player-stat-word">Позиция</p>
@@ -476,7 +486,8 @@
                         </div>
                         <div class="repeate-game">
                             <a class="repeate-game-close-button" onclick="document.getElementById('myDialog').close()">Закрыть</a>
-                            <a class="repeate-game-button" href="{% url 'main:game'%}">Играть ещё раз</a>
+{#                            <a class="repeate-game-button" href="{% url 'main:new_game' %}">Играть ещё раз</a>#}
+                            <a class="repeate-game-button" href="{% new_game %}">Играть ещё раз</a>
                         </div>
                     </div>
                 </dialog>
@@ -517,7 +528,7 @@
                     {% elif hidden_player.team != selected_player.team %}
                         <div class="block block__team">
                     {% endif %}
-                <p>{{ selected_player.team }}</p>
+                <img class="logo" src="{{ selected_player.team|logo_tag }}">
                 </div>
                     {% if hidden_player.role == selected_player.role %}
                         <div class="block block__role green">
@@ -543,7 +554,8 @@
                     {% elif hidden_player.country != selected_player.country %}
                         <div class="block block__country">
                     {% endif %}
-                <p>{{ selected_player.country }}</p>
+                {#                <p>{{ selected_player.country|flag_tag }}</p>#}
+                <img class="flag" src="{{ selected_player.country|flag_tag }}">
                 </div>
                     {% if hidden_player.cl == selected_player.cl %}
                         <div class="block block__cl green">
@@ -571,7 +583,18 @@
                 </div>
                 </div>
                 {% endfor %}
+                <div class="attempts in-game">
+                    {% for attempt in attempts|make_list %}
+                        {% if attempt == 1 %}
+                            <div class="attempt failed"></div>
+                        {% elif attempt == 0 %}
+                            <div class="attempt"></div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             {% endif %}
+
+
             </div>
             <div class="help">
                 <a href="#">Как играть</a>

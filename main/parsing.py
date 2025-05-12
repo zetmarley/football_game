@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from config.settings import MEDIA_ROOT
-from main.models import Player
+from main.models import Player, Logo, Flag
 
 
 def reform_role(role):
@@ -32,8 +32,8 @@ def players_parsing():
         "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0"
     }
 
-    players_counting = (lambda: [1 + 25 * i for i in range(1)])()
-    pages = [1 + i for i in range(1)]
+    players_counting = (lambda: [1 + 25 * i for i in range(20)])()
+    pages = [1 + i for i in range(20)]
     players = []
     player_profiles_links = []
     for page in pages:
@@ -46,8 +46,6 @@ def players_parsing():
         costs = soup.find_all('td', class_="rechts hauptlink")
         name_n_role = soup.find_all('table', class_='inline-table')
         team_age_country = soup.find_all('td', class_='zentriert')  # commands
-        # ages = soup.find_all('td', class_="zentriert") #ages
-        # countries = soup.find_all('td', class_="zentriert") #countries
 
         players_count = players_counting[pages.index(page)]
         for nr in name_n_role:
@@ -67,11 +65,26 @@ def players_parsing():
         for team in team_age_country:
             if team.find_all('a'):
                 index = players_count
+                logo = team.find('img').get('src')
                 team = team.find('a').get('title')
+                print(team, logo)
                 players_count += 1
                 for i in players:
                     if i['id'] == index:
                         i['team'] = team
+
+                logo_path = f'{MEDIA_ROOT}/logo/{team.replace(' ', '_')}.png'
+                if not os.path.exists(logo_path):
+                    with open(logo_path, "wb") as f:
+                        f.write(requests.get(logo).content)
+
+                html_logo_path = f'/media/logo/{team.replace(' ', '_')}.png'
+
+                Logo.objects.update_or_create(
+                    team=team,
+                    defaults={
+                        'pic': html_logo_path
+                    })
 
         count = 0
         players_count = players_counting[pages.index(page)]
@@ -99,11 +112,27 @@ def players_parsing():
         players_count = players_counting[pages.index(page)]
         for c in team_age_country:
             if c.find('img', class_="flaggenrahmen"):
+                flag = c.find('img', class_="flaggenrahmen").get('src')
                 country = c.find('img', class_="flaggenrahmen").get('alt')
+                print(country, flag)
                 for i in players:
                     if i['id'] == players_count:
                         i['country'] = country
                 players_count += 1
+
+                flag_path = f'{MEDIA_ROOT}/flags/{country.replace(' ', '_')}.png'
+
+                if not os.path.exists(flag_path):
+                    with open(flag_path, "wb") as f:
+                        f.write(requests.get(flag).content)
+
+                html_flag_path = f'/media/flags/{country.replace(' ', '_')}.png'
+
+                Flag.objects.update_or_create(
+                    country=country,
+                    defaults={
+                        'pic': html_flag_path
+                    })
 
         for l in links:
             if 'profil/spieler' in l.find('a')['href']:

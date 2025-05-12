@@ -22,6 +22,11 @@ def get_session_values(request):
     return user
 
 
+def new_game(request):
+    if request.session['user']:
+        del request.session['user']
+
+
 class GameView(TemplateView):
     template_name = f"{BASE_DIR}/main/templates/game.html"
 
@@ -36,35 +41,29 @@ class GameView(TemplateView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        if request.session['user']['attempts'] == 0:
-            set_session_value(request)
-            GameView.get(request, *args, **kwargs)
-            # set_session_value(request)
-            # context = self.get_context_data(**kwargs)
-            # context['selected_players'] = request.session['user']['selected_players']
-            # context['hidden_player'] = request.session['user']['hidden_player']
-            # context['attempts'] = request.session['user']['attempts']
-            # context['show_dialog '] = request.session['user']['show_dialog']
-            # return self.render_to_response(context)
-        selected_player = Player.objects.get(name=request.POST.get('footballer'))
         context = super().get_context_data(**kwargs)
-        selected_players = request.session.get('user')['selected_players']
-        if request.session['user']['hidden_player'] != selected_player:
-            selected_players.append(selected_player)
-            request.session['user']['selected_players'] = selected_players
-            request.session['user']['attempts'] -= 1
-            request.session.save()
+        if not get_session_values(request):
+            set_session_value(request)
+            return render(request, self.template_name, context)
         else:
-            selected_players.append(selected_player)
-            request.session['user']['selected_players'] = selected_players
-            request.session.save()
+            selected_player = Player.objects.get(name=request.POST.get('footballer'))
+            selected_players = request.session.get('user')['selected_players']
+            if request.session['user']['hidden_player'] != selected_player:
+                selected_players.append(selected_player)
+                request.session['user']['selected_players'] = selected_players
+                request.session['user']['attempts'] -= 1
+                request.session.save()
+            else:
+                selected_players.append(selected_player)
+                request.session['user']['selected_players'] = selected_players
+                request.session.save()
 
-        context['hidden_player'] = request.session['user']['hidden_player']
-        context['selected_players'] = request.session['user']['selected_players']
-        context['attempts'] = request.session['user']['attempts']
-        context['show_dialog '] = request.session['user']['show_dialog']
+            context['hidden_player'] = request.session['user']['hidden_player']
+            context['selected_players'] = request.session['user']['selected_players']
+            context['attempts'] = request.session['user']['attempts']
+            context['show_dialog '] = request.session['user']['show_dialog']
 
-        return render(request, self.template_name, context)
+            return render(request, self.template_name, context)
 
 
 def autocomplete(request):
