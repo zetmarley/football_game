@@ -3,6 +3,8 @@
 {% load flag_tag %}
 {% load logo_tag %}
 {% load new_game %}
+{% load first_name %}
+{% load last_name %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -299,6 +301,13 @@
             font-size: 32px;
             line-height: 30px;
             text-align: center;
+            font-weight: 500;
+        }
+
+        .in-result-words {
+            font-weight: 700;
+            font-size: 32px;
+            line-height: 32px;
         }
 
         .player-info {
@@ -327,6 +336,18 @@
             display: flex;
             flex-direction: row;
             font-size: 24px;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .first-name {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .last-name {
+            font-size: 24px;
+            font-weight: 300;
         }
 
         .player-details {
@@ -343,7 +364,19 @@
         }
 
         .player-stat-word {
-        {#font-family: "Sansation", light;#}
+            font-size: 16px;
+            font-weight: 300;
+            color: rgb(255, 255,255, 0.5)
+        }
+
+        .player-stat-word-show {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .team-number {
+            font-weight: 300;
+            color: rgb(255, 255,255, 0.5)
         }
 
         .repeate-game {
@@ -415,6 +448,12 @@
             height: 16px;
         }
 
+        .flag-in-result {
+            width: 29px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
         .custom-autocomplete-menu {
             max-width: 824px;
             border-radius: 8px;
@@ -467,24 +506,27 @@
         input:focus {
             outline: none;
         }
-        
+
         .ui-autocomplete {
-            border: none !important;
-            outline: none !important;
             background-clip: padding-box !important;
             padding: 0 !important;
         }
 
-        .ui-menu {
+        .ui-menu .ui-autocomplete .ui-menu-item {
             border: none !important;
             outline: none !important;
         }
 
         .ui-menu-item {
-            border: none !important;
-            outline: none !important;
             margin: 0 !important;
         }
+
+        dialog::backdrop {
+            position: fixed;
+            inset: 0px;
+            background: rgba(0, 0, 0, 0.75);
+        }
+
 
     </style>
 </head>
@@ -508,7 +550,7 @@
                     <div class="result">
                         <a onclick="document.getElementById('myDialog').close()" class="exit-button"></a>
                         <div class="gif-attempts_words">
-                            <img class="gif" src="/media/gifs/gif.svg">
+                            <img class="gif" src="/media/gifs/win.gif">
                             <div class="attempts">
                                 {% for attempt in attempts|make_list %}
                                     {% if attempt == 1 %}
@@ -520,11 +562,11 @@
                             </div>
                             <div class="result-words">
                                 {% if attempts == 0 %}
-                                    <p>Автогол! 🥅</p>
-                                    <p>Попробуй другого игрока!</p>
+                                    <p class="in-result-words">Автогол! 🥅</p>
+                                    <p class="in-result-words">Попробуй другого игрока!</p>
                                 {% elif attempts > 0 %}
-                                    <p>В точку! 🎯 </p>
-                                    <p>Ты угадал футболиста!</p>
+                                    <p class="in-result-words">В точку! 🎯</p>
+                                    <p class="in-result-words">Ты угадал футболиста!</p>
                                 {% endif %}
                             </div>
                         </div>
@@ -532,25 +574,29 @@
                             <img class="player-pic" src={{ hidden_player.photo_path }}>
                             <div class="player-text">
                                 <div class="player-title">
-                                    <p>{{ hidden_player.name }} | </p>
-                                    <img class="flag" src="{{ selected_player.country|flag_tag }}">
+                                    <p class="first-name">{{ hidden_player.name|first_name }}</p>
+                                    <p class="last-name">{{ hidden_player.name|last_name }}</p>
+                                    {% if hidden_player.team_number %}
+                                        <p class="team-number">{{ hidden_player.team_number }}</p>
+                                    {% endif %}
+                                    <img class="flag-in-result" src="{{ hidden_player.country|flag_tag }}">
                                 </div>
                                 <div class="player-details">
                                     <div class="player-stat">
                                         <p class="player-stat-word">Команда</p>
-                                        <img class="logo" src="{{ selected_player.team|logo_tag }}">
+                                        <p class="player-stat-word-show">{{ hidden_player.team }}</p>
                                     </div>
                                     <div class="player-stat">
                                         <p class="player-stat-word">Позиция</p>
-                                        <p>{{ hidden_player.role }}</p>
+                                        <p class="player-stat-word-show">{{ hidden_player.role }}</p>
                                     </div>
                                     <div class="player-stat">
                                         <p class="player-stat-word">Возраст</p>
-                                        <p>{{ hidden_player.age }}</p>
+                                        <p class="player-stat-word-show">{{ hidden_player.age }}</p>
                                     </div>
                                     <div class="player-stat">
                                         <p class="player-stat-word">Лига чемпионов</p>
-                                        <p>{{ hidden_player.cl }}</p>
+                                        <p class="player-stat-word-show">{{ hidden_player.cl }}</p>
                                     </div>
                                 </div>
                             </div>
