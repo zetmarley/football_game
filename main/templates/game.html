@@ -139,13 +139,23 @@
         .block__name {
             border-radius: 4px;
             height: 100%;
-            width: 167px;
+            width: 252px;
+        }
+        
+        .block__first-name {
+            font-size: 14px;
+            font-weight: 300;
+        }
+        
+        .block__last-name {
+            font-size: 14px;
+            font-weight: 700;
         }
 
         .block__team {
             border-radius: 4px;
             height: 100%;
-            width: 110px;
+            width: 80px;
         }
 
         .block__role {
@@ -169,7 +179,7 @@
         .block__cl {
             border-radius: 4px;
             height: 100%;
-            width: 110px;
+            width: 55px;
         }
 
         .block__cost {
@@ -190,7 +200,7 @@
             max-width: 824px;
             /* height: 100%; */
             position: absolute;
-            top: 40%;
+            top: 35%;
             /* margin-left: 20px;
             margin-right: 20px; */
             z-index: -3;
@@ -400,6 +410,7 @@
             border-radius: 14px;
             align-items: center;
             justify-content: center;
+            outline: none;
         }
 
         .repeate-game-button {
@@ -412,6 +423,7 @@
             border-radius: 14px;
             align-items: center;
             justify-content: center;
+            outline: none;
         }
 
         .attempts {
@@ -531,7 +543,8 @@
             <form class="no_form" method="POST">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <input autocomplete="off" class="input" type="text" name="footballer" id="footballer" placeholder="Напиши имя игрока..."/>
+                <input autocomplete="off" class="input" type="text" name="footballer" id="footballer"
+                       placeholder="Напиши имя игрока..."/>
                 <input autocomplete="off" type="hidden" id="footballer_id">
                 <div id="autocomplete-menu" class="autocomplete-menu"></div>
             </form>
@@ -628,14 +641,16 @@
                 {% for selected_player in selected_players %}
                     <div class="players-panel">
                     <div class="block block__name">
-                        <p>{{ selected_player.name }}</p>
+                        <p class="block__first-name">{{ selected_player.name|first_name }}</p>
+                        <p class="block__last-name">{{ selected_player.name|last_name }}</p>
+                        {#                        <p>{{ selected_player.name }}</p>#}
                     </div>
                     {% if hidden_player.team == selected_player.team %}
                         <div class="block block__team green">
                     {% elif hidden_player.team != selected_player.team %}
                         <div class="block block__team">
                     {% endif %}
-                <img class="logo" src="{{ selected_player.team|logo_tag }}">
+                <img class="logo" title="{{ selected_player.team }}" src="{{ selected_player.team|logo_tag }}">
                 </div>
                     {% if hidden_player.role == selected_player.role %}
                         <div class="block block__role green">
@@ -661,8 +676,7 @@
                     {% elif hidden_player.country != selected_player.country %}
                         <div class="block block__country">
                     {% endif %}
-                {#                <p>{{ selected_player.country|flag_tag }}</p>#}
-                <img class="flag" src="{{ selected_player.country|flag_tag }}">
+                <img class="flag" title="{{ selected_player.country }}" src="{{ selected_player.country|flag_tag }}">
                 </div>
                     {% if hidden_player.cl == selected_player.cl %}
                         <div class="block block__cl green">
