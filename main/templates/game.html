@@ -5,6 +5,7 @@
 {% load new_game %}
 {% load first_name %}
 {% load last_name %}
+{% load int_from_cost %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -28,12 +29,7 @@
             /*border: 1px red solid;*/
         }
 
-        /* @media screen and (max-width: 849px) {
-            .game {
-                padding-left: 75px;
-                padding-right: 75px;
-            }
-            } */
+
         main {
             display: flex;
             justify-content: center;
@@ -91,6 +87,7 @@
             background-position-y: 50%;
             color: black;
             padding-left: 17px;
+            z-index: 0;
         }
 
         .input::placeholder {
@@ -107,6 +104,7 @@
             gap: 4px;
             background-color: #362431;
             border-radius: 4px;
+            z-index: -4;
         }
 
         .players-panel {
@@ -118,6 +116,7 @@
             gap: 4px;
             background-color: transparent;
             border-radius: 4px;
+            z-index: -4;
         }
 
         .block {
@@ -194,6 +193,7 @@
             top: 40%;
             /* margin-left: 20px;
             margin-right: 20px; */
+            z-index: -3;
         }
 
         .game {
@@ -203,6 +203,7 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
+            z-index: -4;
         }
 
         .words {
@@ -216,7 +217,8 @@
             display: flex;
             flex-direction: row;
             gap: 7px;
-            align-items: center;
+        {#margin-top: 50px;#} align-items: center;
+            z-index: -6;
         }
 
         a {
@@ -339,12 +341,12 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .first-name {
             font-size: 24px;
             font-weight: 700;
         }
-        
+
         .last-name {
             font-size: 24px;
             font-weight: 300;
@@ -366,17 +368,17 @@
         .player-stat-word {
             font-size: 16px;
             font-weight: 300;
-            color: rgb(255, 255,255, 0.5)
+            color: rgb(255, 255, 255, 0.5)
         }
 
         .player-stat-word-show {
             font-size: 16px;
             font-weight: 700;
         }
-        
+
         .team-number {
             font-weight: 300;
-            color: rgb(255, 255,255, 0.5)
+            color: rgb(255, 255, 255, 0.5)
         }
 
         .repeate-game {
@@ -424,6 +426,7 @@
         .in-game {
             padding-top: 20px;
             padding-bottom: 10px;
+            z-index: -4;
         }
 
         .attempt {
@@ -454,72 +457,10 @@
             border-radius: 4px;
         }
 
-        .custom-autocomplete-menu {
-            max-width: 824px;
-            border-radius: 8px;
-            border-color: #363638;
-            background-color: #363638;
-            z-index: 1;
-        }
-
-        .ui-menu-item {
-            width: 100%;
-            height: 42px;
-            background-color: #363638;
-            border: none;
-            border-radius: 8px;
-            font-family: "Sansation", sans-serif;
-            font-size: 17px;
-            line-height: 22px;
-            color: white;
-            outline: none !important;
-        }
-
-        .ui-autocomplete {
-            border: none;
-            outline: none !important;
-        }
-
-        .ui-menu-item:hover {
-            background-color: white;
-            color: black;
-            border: none;
-            border-radius: 0px;
-            z-index: 0;
-        }
-
-
-        .autocomplete-item {
-            display: flex;
-            align-items: center;
-        }
-
-
-        .ui-menu .ui-menu-item .ui-state-hover,
-        .ui-menu .ui-menu-item .ui-state-active {
-            background: none !important;
-            border: none !important;
-            color: inherit !important;
-            margin: 0 !important;
-        }
-
         input:focus {
             outline: none;
         }
 
-        .ui-autocomplete {
-            background-clip: padding-box !important;
-            padding: 0 !important;
-        }
-
-        .ui-menu .ui-autocomplete .ui-menu-item {
-            border: none !important;
-            outline: none !important;
-        }
-
-        .ui-menu-item {
-            margin: 0 !important;
-        }
 
         dialog::backdrop {
             position: fixed;
@@ -527,7 +468,54 @@
             background: rgba(0, 0, 0, 0.75);
         }
 
+        .autocomplete-menu {
+            display: none; /* Скрыто по умолчанию */
+            position: absolute;
+        {#top: calc(100% - 56px);#} padding-top: 46px;
+        {#padding-bottom: 16px;#} max-width: 824px;
+            width: 100%;
+        {#max-height: 200px;#} overflow-y: hidden;
+            overflow-x: hidden;
+            background: #363638;
+            color: white;
+            border: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: none;
+            z-index: -1;
+        }
 
+        .autocomplete-item {
+            max-width: 824px;
+            width: 100%;
+            height: 44px;
+            padding-left: 16px;
+        {#padding: 8px 12px;#} cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            z-index: 2;
+            gap: 5px;
+            line-height: 20px;
+            transition: 0.2s;
+        }
+
+        .autocomplete-item:hover {
+            background: white;
+            color: black;
+            font-size: 30px;
+            transform: scale(1.2);
+            padding-left: 90px;
+        }
+
+        .autocomplete-item__first-name {
+            font-weight: 300;
+            font-size: 14px;
+        }
+
+        .autocomplete-item__last-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -543,7 +531,9 @@
             <form class="no_form" method="POST">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <input class="input" type="text" name="footballer" id="footballer" placeholder="Напиши имя игрока..."/>
+                <input autocomplete="off" class="input" type="text" name="footballer" id="footballer" placeholder="Напиши имя игрока..."/>
+                <input autocomplete="off" type="hidden" id="footballer_id">
+                <div id="autocomplete-menu" class="autocomplete-menu"></div>
             </form>
             {% if hidden_player in selected_players or attempts == 0 %}
                 <dialog class="dialog" id="myDialog">
@@ -692,9 +682,9 @@
                         <div class="block block__cost yellow">
                     {% endif %}
                 <p>{{ selected_player.cost }}</p>
-                {% if hidden_player.cost > selected_player.cost %}
+                {% if hidden_player.cost|int_from_cost > selected_player.cost|int_from_cost %}
                     <img class="arrow" src="/media/arrow.svg">
-                {% elif hidden_player.cost < selected_player.cost %}
+                {% elif hidden_player.cost|int_from_cost < selected_player.cost|int_from_cost %}
                     <img class="arrow rotate" src="/media/arrow.svg">
                 {% endif %}
                 </div>
@@ -721,81 +711,66 @@
     </section>
 </main>
 </body>
-{#<script>#}
-{#    $(document).ready(function () {#}
-{#        $('#footballer').autocomplete({#}
-{#            source: function (request, response) {#}
-{#                $.ajax({#}
-{#                    url: "{% url 'main:autocomplete' %}",#}
-{#                    data: {#}
-{#                        'term': request.term#}
-{#                    },#}
-{#                    success: function (data) {#}
-{#                        response($.map(data, function (item) {#}
-{#                            return {#}
-{#                                label: item.label,#}
-{#                                value: item.label,#}
-{#                                id: item.id#}
-{#                            };#}
-{#                        }));#}
-{##}
-{#                    }#}
-{#                });#}
-{#            },#}
-{#            minLength: 2,#}
-{#            select: function (event, ui) {#}
-{#                console.log("Выбран футболист: " + ui.item.id);#}
-{#            }#}
-{#        });#}
-{#    });#}
-{#</script>#}
 <script>
-    $(document).ready(function () {
-        // Создаем кастомный рендеринг для элементов автодополнения
-        $.ui.autocomplete.prototype._renderItem = function (ul, item) {
-            // Здесь мы создаем HTML для каждого элемента
-            return $("<li>")
-                .append(`
-                    <div class="autocomplete-item">
-                        <span class="player-name">${item.label}</span>
-                    </div>
-                `)
-                .appendTo(ul);
-        };
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('footballer');
+        const hiddenInput = document.getElementById('footballer_id');
+        const menu = document.getElementById('autocomplete-menu');
 
-        $('#footballer').autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: "{% url 'main:autocomplete' %}",
-                    data: {
-                        'term': request.term
-                    },
-                    success: function (data) {
-                        response($.map(data, function (item) {
-                            return {
-                                label: item.label,  // Основное имя для поиска
-                                value: item.label,  // Что будет вставлено в инпут
-                                id: item.id,        // Дополнительные данные
-                                team: item.team     // Дополнительные данные
-                            };
-                        }));
-                    }
-                });
-            },
-            minLength: 2,
-            select: function (event, ui) {
-                console.log("Выбран футболист: " + ui.item.id);
-                // Можно также обновить скрытое поле с ID, если нужно
-                $('#footballer_id').val(ui.item.id);
+        input.addEventListener('input', function (e) {
+            const searchTerm = e.target.value.trim();
+
+            if (searchTerm.length < 2) {
+                menu.style.display = 'none';
+                return;
             }
-        }).autocomplete("instance")._renderMenu = function (ul, items) {
-            var that = this;
-            $.each(items, function (index, item) {
-                that._renderItemData(ul, item);
-            });
-            // Добавляем класс к меню
-            $(ul).addClass("custom-autocomplete-menu");
-        };
+
+            fetch(`/autocomplete/?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        menu.style.display = 'none';
+                        return;
+                    }
+
+                    menu.innerHTML = ''; // Очищаем меню
+                    data.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'autocomplete-item';
+
+                        // Разделяем текст по первому пробелу
+                        const [firstName, lastName] = item.label.split(/(?<=^\S+)\s/); // Разделение на 2 части
+
+                        itemElement.innerHTML = `
+                            <span class="autocomplete-item__first-name">${firstName}</span>
+                            <span class="autocomplete-item__last-name"> ${lastName}</span>  <!-- Пробел перед фамилией -->
+                            `;
+                        {#    itemElement.innerHTML = `#}
+                        {#    <span class="player-name">${item.label}</span>#}
+                        {#`;#}
+                        itemElement.addEventListener('click', () => {
+                            input.value = item.label;
+                            hiddenInput.value = item.id;
+                            menu.style.display = 'none';
+
+                            const form = input.closest('form');
+                            if (form) {
+                                form.submit();
+                            }
+                        });
+                        menu.appendChild(itemElement);
+                    });
+
+                    menu.style.display = 'block';
+                });
+        });
+
+        // Закрываем меню при клике вне его
+        document.addEventListener('click', function (e) {
+            if (e.target !== input && !menu.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        });
     });
 </script>
 <script>

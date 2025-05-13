@@ -67,9 +67,7 @@ class GameView(TemplateView):
 
 
 def autocomplete(request):
-    if 'term' in request.GET:
-        term = request.GET['term']
-        footballers = Player.objects.filter(name__icontains=term)[:10]
-        results = [{'id': f.id, 'label': f.name} for f in footballers]
-        return JsonResponse(results, safe=False)
-    return JsonResponse([], safe=False)
+    term = request.GET.get('term', '')
+    results = Player.objects.filter(name__icontains=term)[:5]  # Пример запроса
+    data = [{'label': f.name, 'id': f.id} for f in results]  # Формат для JS
+    return JsonResponse(data, safe=False)
