@@ -11,8 +11,8 @@ from main.models import Player
 def set_session_value(request):
     session_key = request.session.session_key
 
-    # request.session['user'] = {'hidden_player': random.choice(Player.objects.all()),
-    request.session[session_key] = {'hidden_player': Player.objects.get(name="Matt O'Riley"),
+    request.session[session_key] = {'hidden_player': random.choice(Player.objects.all()),
+    # request.session[session_key] = {'hidden_player': Player.objects.get(name="Matt O'Riley"),
     'selected_players': [],
     'attempts': 8,
     'show_dialog': False}
