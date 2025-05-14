@@ -32,8 +32,8 @@ def players_parsing():
         "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0"
     }
 
-    players_counting = (lambda: [1 + 25 * i for i in range(20)])()
-    pages = [1 + i for i in range(20)]
+    players_counting = (lambda: [1 + 25 * i for i in range(1)])()
+    pages = [1 + i for i in range(1)]
     players = []
     player_profiles_links = []
     for page in pages:
@@ -67,7 +67,6 @@ def players_parsing():
                 index = players_count
                 logo = team.find('img').get('src')
                 team = team.find('a').get('title')
-                print(team, logo)
                 players_count += 1
                 for i in players:
                     if i['id'] == index:
@@ -114,7 +113,6 @@ def players_parsing():
             if c.find('img', class_="flaggenrahmen"):
                 flag = c.find('img', class_="flaggenrahmen").get('src')
                 country = c.find('img', class_="flaggenrahmen").get('alt')
-                print(country, flag)
                 for i in players:
                     if i['id'] == players_count:
                         i['country'] = country
@@ -164,6 +162,9 @@ def players_parsing():
             profiles_response = requests.get(link, headers=headers)
             soup = BeautifulSoup(profiles_response.text, "lxml")
             try:
+                team_number = soup.find('div', class_="data-header__headline-container")
+                team_number = team_number.find('span', class_="data-header__shirt-number").text
+                team_number = team_number.replace('#', '')
                 profile = soup.find('div', class_='modal__content')
                 profile = profile.find('img')
                 name = profile.get('alt')
@@ -179,6 +180,8 @@ def players_parsing():
                 else:
                     print(f'Photo {name} updated {player_profiles_links.index(link)}/{len(player_profiles_links)}')
                 player.photo_path = f'/media/players/{name.replace(' ', '_')}.png'
+                if team_number:
+                    player.team_number = team_number
 
                 cl = soup.find_all('img')
                 for i in cl:

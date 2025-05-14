@@ -3,6 +3,10 @@
 {% load flag_tag %}
 {% load logo_tag %}
 {% load new_game %}
+{% load first_name %}
+{% load last_name %}
+{% load int_from_cost %}
+{% load gif %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,7 +14,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>football</title>
+    <title>FootGuess</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
@@ -26,12 +30,7 @@
             /*border: 1px red solid;*/
         }
 
-        /* @media screen and (max-width: 849px) {
-            .game {
-                padding-left: 75px;
-                padding-right: 75px;
-            }
-            } */
+
         main {
             display: flex;
             justify-content: center;
@@ -43,11 +42,7 @@
             width: 100%;
             max-height: 100%;
         }
-
-        .center {
-            padding-left: calc(50% - 100px);
-            padding-right: calc(50% - 100px);
-        }
+        
 
         body {
             background-color: #242426;
@@ -58,11 +53,8 @@
 
         .title {
             font-size: 32px;
-            line-height: Label Large/Line Height;
-            letter-spacing: Label Large/Tracking;
             text-align: center;
             vertical-align: middle;
-            /*font-weight: 500;*/
             font-style: normal;
             font-variation-settings: "wdth" 100;
             width: 100%;
@@ -71,8 +63,6 @@
         .subtitle {
             font-weight: 300;
             font-size: 16px;
-            /* line-height: Label Large/Line Height; */
-            /* letter-spacing: Label Large/Tracking; */
             text-align: center;
             vertical-align: middle;
         }
@@ -89,6 +79,7 @@
             background-position-y: 50%;
             color: black;
             padding-left: 17px;
+            z-index: 0;
         }
 
         .input::placeholder {
@@ -105,6 +96,7 @@
             gap: 4px;
             background-color: #362431;
             border-radius: 4px;
+            z-index: -4;
         }
 
         .players-panel {
@@ -116,6 +108,7 @@
             gap: 4px;
             background-color: transparent;
             border-radius: 4px;
+            z-index: -4;
         }
 
         .block {
@@ -126,6 +119,7 @@
             align-items: center;
             gap: 3px;
         }
+
 
         .green {
             background-color: #214D3B;
@@ -138,13 +132,23 @@
         .block__name {
             border-radius: 4px;
             height: 100%;
-            width: 167px;
+            width: 252px;
+        }
+
+        .block__first-name {
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        .block__last-name {
+            font-size: 14px;
+            font-weight: 700;
         }
 
         .block__team {
             border-radius: 4px;
             height: 100%;
-            width: 110px;
+            width: 80px;
         }
 
         .block__role {
@@ -168,7 +172,7 @@
         .block__cl {
             border-radius: 4px;
             height: 100%;
-            width: 110px;
+            width: 55px;
         }
 
         .block__cost {
@@ -183,15 +187,11 @@
             align-items: center;
             align-self: center;
             gap: 32px;
-            /* padding: auto;
-            margin: auto; */
             width: 100%;
             max-width: 824px;
-            /* height: 100%; */
             position: absolute;
-            top: 40%;
-            /* margin-left: 20px;
-            margin-right: 20px; */
+            top: 35%;
+            z-index: -3;
         }
 
         .game {
@@ -201,6 +201,7 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
+            z-index: -4;
         }
 
         .words {
@@ -215,22 +216,17 @@
             flex-direction: row;
             gap: 7px;
             align-items: center;
+            z-index: -6;
         }
 
         a {
             text-decoration: none;
             color: white;
-            /*font-weight: 500;*/
         }
 
         .ellipse {
             width: 6px;
             height: 6px;
-        }
-
-        .arrow {
-            /*width: 7.5px;*/
-            /*height: 3.5px;*/
         }
 
         .rotate {
@@ -248,12 +244,32 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(1.2);
+            transition: all 0.3s ease-out;
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
             padding: 30px 24px;
             box-sizing: border-box;
+        }
+
+        .dialog[open] {
+            animation: dialogFadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes dialogFadeIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0;
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(1.03);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
         }
 
         .result {
@@ -280,7 +296,7 @@
             height: 204px;
             display: flex;
             flex-direction: column;
-        {#justify-content: space-between;#} align-items: center;
+            align-items: center;
             gap: 12px;
         }
 
@@ -299,6 +315,13 @@
             font-size: 32px;
             line-height: 30px;
             text-align: center;
+            font-weight: 500;
+        }
+
+        .in-result-words {
+            font-weight: 700;
+            font-size: 32px;
+            line-height: 32px;
         }
 
         .player-info {
@@ -327,6 +350,18 @@
             display: flex;
             flex-direction: row;
             font-size: 24px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .first-name {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .last-name {
+            font-size: 24px;
+            font-weight: 300;
         }
 
         .player-details {
@@ -343,7 +378,19 @@
         }
 
         .player-stat-word {
-            font-family: "Sansation", light;
+            font-size: 16px;
+            font-weight: 300;
+            color: rgb(255, 255, 255, 0.5)
+        }
+
+        .player-stat-word-show {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .team-number {
+            font-weight: 300;
+            color: rgb(255, 255, 255, 0.5)
         }
 
         .repeate-game {
@@ -365,6 +412,7 @@
             border-radius: 14px;
             align-items: center;
             justify-content: center;
+            outline: none;
         }
 
         .repeate-game-button {
@@ -377,6 +425,7 @@
             border-radius: 14px;
             align-items: center;
             justify-content: center;
+            outline: none;
         }
 
         .attempts {
@@ -391,6 +440,7 @@
         .in-game {
             padding-top: 20px;
             padding-bottom: 10px;
+            z-index: -4;
         }
 
         .attempt {
@@ -415,6 +465,72 @@
             height: 16px;
         }
 
+        .flag-in-result {
+            width: 29px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+
+        dialog::backdrop {
+            position: fixed;
+            inset: 0px;
+            background: rgba(0, 0, 0, 0.75);
+            transition: opacity 0.3s ease-out;
+        }
+
+        .autocomplete-menu {
+            display: none;
+            position: absolute;
+            padding-top: 46px;
+            max-width: 824px;
+            width: 100%;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            background: #363638;
+            color: white;
+            border: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: none;
+            z-index: -1;
+        }
+
+        .autocomplete-item {
+            max-width: 824px;
+            width: 100%;
+            height: 44px;
+            padding-left: 16px;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            z-index: 2;
+            gap: 5px;
+            line-height: 20px;
+            transition: 0.2s;
+        }
+
+        .autocomplete-item:hover {
+            background: white;
+            color: black;
+            font-size: 30px;
+            transform: scale(1.2);
+            padding-left: 90px;
+        }
+
+        .autocomplete-item__first-name {
+            font-weight: 300;
+            font-size: 14px;
+        }
+
+        .autocomplete-item__last-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -422,22 +538,35 @@
 <main>
     <section class="football_game">
         <div class="words">
-            <h1 class="title">Какое то название</h1>
-            <h2 class="subtitle">Подзаголовок</h2>
+            <h1 class="title">FootGuess</h1>
+            <h2 class="subtitle">Найди загаданного игрока за 8 попыток! ⚽</h2>
 {#            <h2 class="subtitle">{{ hidden_player.name }}</h2>#}
         </div>
         <div class="game">
             <form class="no_form" method="POST">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <input class="input" type="text" name="footballer" id="footballer" placeholder="Напиши имя игрока..."/>
+                <input autocomplete="off" class="input" type="text" name="footballer" id="footballer"
+                       placeholder="Напиши имя игрока..."/>
+                <input autocomplete="off" type="hidden" id="footballer_id">
+                <div id="autocomplete-menu" class="autocomplete-menu"></div>
             </form>
             {% if hidden_player in selected_players or attempts == 0 %}
                 <dialog class="dialog" id="myDialog">
                     <div class="result">
                         <a onclick="document.getElementById('myDialog').close()" class="exit-button"></a>
                         <div class="gif-attempts_words">
-                            <img class="gif" src="/media/gifs/gif.svg">
+                            {% if attempts == 0 %}
+                                <video class="gif" autoplay loop>
+                                    <source src="/media/gifs/lose/{{ 'lose'|gif }}" width="100px" height="100px"
+                                            type='video/webm; codecs="vp8, vorbis"'>
+                                </video>
+                            {% elif attempts > 0 %}
+                                <video class="gif" autoplay loop>
+                                    <source src="/media/gifs/win/{{ 'win'|gif }}" width="100px" height="100px"
+                                            type='video/webm; codecs="vp8, vorbis"'>
+                                </video>
+                            {% endif %}
                             <div class="attempts">
                                 {% for attempt in attempts|make_list %}
                                     {% if attempt == 1 %}
@@ -449,44 +578,49 @@
                             </div>
                             <div class="result-words">
                                 {% if attempts == 0 %}
-                                    <p>Автогол! 🥅</p>
-                                    <p>Попробуй другого игрока!</p>
+                                    <p class="in-result-words">Автогол! 🥅</p>
+                                    <p class="in-result-words">Попробуй другого игрока!</p>
                                 {% elif attempts > 0 %}
-                                    <p>В точку! 🎯 </p>
-                                    <p>Ты угадал футболиста!</p>
+                                    <p class="in-result-words">В точку! 🎯</p>
+                                    <p class="in-result-words">Ты угадал футболиста!</p>
                                 {% endif %}
                             </div>
                         </div>
                         <div class="player-info">
-                            <img class="player-pic" src={{ hidden_player.photo_path }}>
+                            {% if hidden_player.photo_path %}
+                                <img class="player-pic" src={{ hidden_player.photo_path }}>
+                            {% endif %}
                             <div class="player-text">
                                 <div class="player-title">
-                                    <p>{{ hidden_player.name }} | </p>
-                                    <img class="flag" src="{{ selected_player.country|flag_tag }}">
+                                    <p class="first-name">{{ hidden_player.name|first_name }}</p>
+                                    <p class="last-name">{{ hidden_player.name|last_name }}</p>
+                                    {% if hidden_player.team_number %}
+                                        <p class="team-number">{{ hidden_player.team_number }}</p>
+                                    {% endif %}
+                                    <img class="flag-in-result" src="{{ hidden_player.country|flag_tag }}">
                                 </div>
                                 <div class="player-details">
                                     <div class="player-stat">
                                         <p class="player-stat-word">Команда</p>
-                                        <img class="logo" src="{{ selected_player.team|logo_tag }}">
+                                        <p class="player-stat-word-show">{{ hidden_player.team }}</p>
                                     </div>
                                     <div class="player-stat">
                                         <p class="player-stat-word">Позиция</p>
-                                        <p>{{ hidden_player.role }}</p>
+                                        <p class="player-stat-word-show">{{ hidden_player.role }}</p>
                                     </div>
                                     <div class="player-stat">
                                         <p class="player-stat-word">Возраст</p>
-                                        <p>{{ hidden_player.age }}</p>
+                                        <p class="player-stat-word-show">{{ hidden_player.age }}</p>
                                     </div>
                                     <div class="player-stat">
                                         <p class="player-stat-word">Лига чемпионов</p>
-                                        <p>{{ hidden_player.cl }}</p>
+                                        <p class="player-stat-word-show">{{ hidden_player.cl }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="repeate-game">
                             <a class="repeate-game-close-button" onclick="document.getElementById('myDialog').close()">Закрыть</a>
-{#                            <a class="repeate-game-button" href="{% url 'main:new_game' %}">Играть ещё раз</a>#}
                             <a class="repeate-game-button" href="{% new_game %}">Играть ещё раз</a>
                         </div>
                     </div>
@@ -521,14 +655,15 @@
                 {% for selected_player in selected_players %}
                     <div class="players-panel">
                     <div class="block block__name">
-                        <p>{{ selected_player.name }}</p>
+                        <p class="block__first-name">{{ selected_player.name|first_name }}</p>
+                        <p class="block__last-name">{{ selected_player.name|last_name }}</p>
                     </div>
                     {% if hidden_player.team == selected_player.team %}
                         <div class="block block__team green">
                     {% elif hidden_player.team != selected_player.team %}
                         <div class="block block__team">
                     {% endif %}
-                <img class="logo" src="{{ selected_player.team|logo_tag }}">
+                <img class="logo" title="{{ selected_player.team }}" src="{{ selected_player.team|logo_tag }}">
                 </div>
                     {% if hidden_player.role == selected_player.role %}
                         <div class="block block__role green">
@@ -554,8 +689,7 @@
                     {% elif hidden_player.country != selected_player.country %}
                         <div class="block block__country">
                     {% endif %}
-                {#                <p>{{ selected_player.country|flag_tag }}</p>#}
-                <img class="flag" src="{{ selected_player.country|flag_tag }}">
+                <img class="flag" title="{{ selected_player.country }}" src="{{ selected_player.country|flag_tag }}">
                 </div>
                     {% if hidden_player.cl == selected_player.cl %}
                         <div class="block block__cl green">
@@ -575,9 +709,9 @@
                         <div class="block block__cost yellow">
                     {% endif %}
                 <p>{{ selected_player.cost }}</p>
-                {% if hidden_player.cost > selected_player.cost %}
+                {% if hidden_player.cost|int_from_cost > selected_player.cost|int_from_cost %}
                     <img class="arrow" src="/media/arrow.svg">
-                {% elif hidden_player.cost < selected_player.cost %}
+                {% elif hidden_player.cost|int_from_cost < selected_player.cost|int_from_cost %}
                     <img class="arrow rotate" src="/media/arrow.svg">
                 {% endif %}
                 </div>
@@ -596,38 +730,67 @@
 
 
             </div>
-            <div class="help">
-                <a href="#">Как играть</a>
-                <img class="ellipse" src="/media/ellipse.svg">
-                <a href="#">Моя статистика</a>
-            </div>
+{#            <div class="help">#}
+{#                <a href="#">Как играть</a>#}
+{#                <img class="ellipse" src="/media/ellipse.svg">#}
+{#                <a href="#">Моя статистика</a>#}
+{#            </div>#}
     </section>
 </main>
 </body>
 <script>
-    $(document).ready(function () {
-        $('#footballer').autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: "{% url 'main:autocomplete' %}",
-                    data: {
-                        'term': request.term
-                    },
-                    success: function (data) {
-                        response($.map(data, function (item) {
-                            return {
-                                label: item.label,
-                                value: item.label,
-                                id: item.id
-                            };
-                        }));
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('footballer');
+        const hiddenInput = document.getElementById('footballer_id');
+        const menu = document.getElementById('autocomplete-menu');
 
+        input.addEventListener('input', function (e) {
+            const searchTerm = e.target.value.trim();
+
+            if (searchTerm.length < 2) {
+                menu.style.display = 'none';
+                return;
+            }
+
+            fetch(`/autocomplete/?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        menu.style.display = 'none';
+                        return;
                     }
+
+                    menu.innerHTML = ''; // Очищаем меню
+                    data.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'autocomplete-item';
+                        
+                        const [firstName, lastName] = item.label.split(/(?<=^\S+)\s/); // Разделение на 2 части
+
+                        itemElement.innerHTML = `
+                            <span class="autocomplete-item__first-name">${firstName}</span>
+                            ${lastName ? `<span class="autocomplete-item__last-name"> ${lastName}</span>` : ''}
+`;
+                        itemElement.addEventListener('click', () => {
+                            input.value = item.label;
+                            hiddenInput.value = item.id;
+                            menu.style.display = 'none';
+
+                            const form = input.closest('form');
+                            if (form) {
+                                form.submit();
+                            }
+                        });
+                        menu.appendChild(itemElement);
+                    });
+
+                    menu.style.display = 'block';
                 });
-            },
-            minLength: 2,
-            select: function (event, ui) {
-                console.log("Выбран футболист: " + ui.item.id);
+        });
+        
+        document.addEventListener('click', function (e) {
+            if (e.target !== input && !menu.contains(e.target)) {
+                menu.style.display = 'none';
             }
         });
     });

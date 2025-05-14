@@ -7,6 +7,7 @@ register = template.Library()
 def new_game(context):
     """Удаляет ключ из сессии."""
     request = context.get('request')
-    if request.session['user']:
-        del request.session['user']
+    session_key = request.session.session_key
+    if request.session[session_key]:
+        del request.session[session_key]
     return ""
