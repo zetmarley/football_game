@@ -10,10 +10,10 @@ from main.models import Player
 
 def set_session_value(request):
     # request.session['user'] = {'hidden_player': random.choice(Player.objects.all()),
-    request.session['user'] = {'hidden_player': Player.objects.get(name='Erling Haaland'),
-                               'selected_players': [],
-                               'attempts': 8,
-                               'show_dialog': False}
+    request.session['user'] = {'hidden_player': Player.objects.get(name="Matt O'Riley"),
+    'selected_players': [],
+    'attempts': 8,
+    'show_dialog': False}
     return HttpResponse("Session value set")
 
 
