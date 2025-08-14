@@ -32,8 +32,8 @@ def players_parsing():
         "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0"
     }
 
-    players_counting = (lambda: [1 + 25 * i for i in range(1)])()
-    pages = [1 + i for i in range(1)]
+    players_counting = (lambda: [1 + 25 * i for i in range(20)])()
+    pages = [1 + i for i in range(20)]
     players = []
     player_profiles_links = []
     for page in pages:

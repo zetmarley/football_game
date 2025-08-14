@@ -17,9 +17,9 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -76,11 +76,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'football_game'),
+        'NAME': os.getenv('DB_NAME', 'footguess'),
         'USER': os.getenv('DB_USER', 'postgres'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'PORT': 5432,
-        # 'HOST': os.getenv('DB_HOST', 'db'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
     }
 }
 
@@ -108,15 +108,15 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/users/'
 
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379')
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://redis:6379')
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://0.0.0.0:6379/1')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://0.0.0.0:6379/1')
 CELERY_TIMEZONE = os.getenv('TIME_ZONE')
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BEAT_SCHEDULE = {
     'players_parsing': {
         'task': 'main.parsing.players_parsing',
-        'schedule': timedelta(days=1),
+        'schedule': timedelta(days=30),
     }}
 
 
@@ -139,13 +139,15 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-#STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 
-STATICFILES_DIRS = (
+if DEBUG :
+    STATICFILES_DIRS = (
      os.path.join(BASE_DIR, 'static'),
  )
+else:
+    STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 
-MEDIA_URL = f'/media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
@@ -153,7 +155,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CACHE_ENABLED = os.getenv('CACHE_ENABLED') == 'True'
+CACHE_ENABLED = True
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
@@ -161,9 +163,9 @@ if CACHE_ENABLED:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            "LOCATION": os.getenv('CACHE_LOCATION', 'redis://127.0.0.1:6379'),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
+            "LOCATION": "redis://0.0.0.0:6379/1",
+            #"OPTIONS": {
+            #    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            #}
         }
     }
