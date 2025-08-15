@@ -34,6 +34,7 @@ INSTALLED_APPS = [
 
     'users',
     'main',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -108,8 +109,8 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/users/'
 
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://0.0.0.0:6379/1')
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://0.0.0.0:6379/1')
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/1')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/1')
 CELERY_TIMEZONE = os.getenv('TIME_ZONE')
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
@@ -123,7 +124,7 @@ CELERY_BEAT_SCHEDULE = {
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 
